@@ -4,6 +4,14 @@ worker:
     repository: rapidsai/rapidsai
     tag: cuda10.0-runtime-ubuntu18.04
     pullPolicy: IfNotPresent
+    args:
+      - dask-cuda-worker
+      - dask-scheduler:8789
+      - --nthreads
+      - 4
+      - --memory-limit
+      - 8G
+      - --no-bokeh
   resources:
     limits:
       cpu: 4
@@ -13,3 +21,10 @@ worker:
       cpu: 4
       memory: 8G
       nvidia.com/gpu: 1
+  env:
+    - name: EXTRA_CONDA_PACKAGES
+      value: cupy gcsfs
+    - name: EXTRA_PIP_PACKAGES
+      value: cupy gcsfs
+    - name: PATH
+      value: /conda/envs/rapids/bin:/conda/condabin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/conda/bin
