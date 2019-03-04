@@ -6,6 +6,7 @@ pipeline {
         sh '''pwd
 cd virtual
 cp /opt/deepops_test/Vagrantfile .
+./cluster_destroy.sh
 ./setup.sh
 ./cluster_up.sh'''
       }
