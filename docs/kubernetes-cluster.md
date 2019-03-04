@@ -9,7 +9,7 @@ Instructions for deploying a GPU cluster with Kubernetes
   * One or more servers on which to install Kubernetes
   * (Optional) Management server (if installing OS via PXE)
 
-# Installation Steps
+## Installation Steps
 
 1. Install a supported operating system.
 
