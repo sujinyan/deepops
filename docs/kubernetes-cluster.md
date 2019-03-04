@@ -18,9 +18,9 @@ Instructions for deploying a GPU cluster with Kubernetes
 
 1. Install a supported operating system.
 
-Install a supported operating system on all servers via
-a 3rd-party solution (i.e. [MAAS](https://maas.io/), [Foreman](https://www.theforeman.org/))
-or utilize the provided [OS install container](PXE.md).
+    Install a supported operating system on all servers via a third-party solution 
+    (i.e. [MAAS](https://maas.io/), [Foreman](https://www.theforeman.org/)) or 
+    utilize the provided [OS install container](PXE.md).
 
 2. Setup a control machine.
 
