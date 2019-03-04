@@ -61,7 +61,7 @@ kubectl get nodes
 kubectl run gpu-test --rm -t -i --restart=Never --image=nvidia/cuda --limits=nvidia.com/gpu=1 -- nvidia-smi
 ```
 
-7. Install the Kubernetes dashboard (optional).
+7. Install the Kubernetes dashboard. (Optional)
 
    Run the script to create an administrative user and print out the dashboard URL and access token:
 
@@ -69,7 +69,7 @@ kubectl run gpu-test --rm -t -i --restart=Never --image=nvidia/cuda --limits=nvi
 ./scripts/k8s_deploy_dashboard_user.sh
 ```
 
-8. Setup presistent storage (optional).
+8. Setup presistent storage. (Optional)
 
    Ceph cluster running on Kubernetes to provide persistent storage
 
@@ -77,7 +77,7 @@ kubectl run gpu-test --rm -t -i --restart=Never --image=nvidia/cuda --limits=nvi
 ./scripts/k8s_deploy_rook.sh
 ```
 
-9. Setup monitoring (optional).
+9. Setup monitoring. (Optional)
 
    Prometheus and Grafana to monitor Kubernetes and cluster nodes
 
@@ -85,7 +85,7 @@ kubectl run gpu-test --rm -t -i --restart=Never --image=nvidia/cuda --limits=nvi
 ./scripts/k8s_deploy_monitoring.sh
 ```
 
-10. Setup the container registry.
+10. Setup the container registry. (Optional)
 
    The default container registry hostname is `registry.local`. To set another hostname (for example,
    one that is resolvable outside the cluster), add `-e container_registry_hostname=registry.example.com`.
