@@ -3,18 +3,13 @@ Kubernetes GPU Cluster Deployment Guide
 
 Instructions for deploying a GPU cluster with Kubernetes
 
-## Overview
-
-**Install Process**
-
-  * Install a supported operating system (Ubuntu/RHEL)
-  * Install Kubernetes
-
-**Requirements**
+## Requirements
 
   * Control system to run the install process
   * One or more servers on which to install Kubernetes
   * (Optional) Management server (if installing OS via PXE)
+
+# Installation Steps
 
 1. Install a supported operating system.
 
