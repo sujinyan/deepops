@@ -16,22 +16,20 @@ Instructions for deploying a GPU cluster with Kubernetes
   * One or more servers on which to install Kubernetes
   * (Optional) Management server (if installing OS via PXE)
 
-## Step 1: Operating System Installation
+1. Install a supported operating system.
 
 Install a supported operating system on all servers via
 a 3rd-party solution (i.e. [MAAS](https://maas.io/), [Foreman](https://www.theforeman.org/))
 or utilize the provided [OS install container](PXE.md).
 
-## Step 2: System Configuration
-
-_Set up control machine_
+2. Setup a control machine.
 
 ```sh
 # Install software prerequisites and copy default configuration
 ./scripts/setup.sh
 ```
 
-_Create server inventory_
+3. Create a server inventory.
 
 ```sh
 # Specify IP addresses of Kubernetes nodes
@@ -41,9 +39,7 @@ _Create server inventory_
 # 	     Make sure the [etcd] group has an odd number of hosts
 ```
 
-## Step 3: Kubernetes Installation
-
-_Install Kubernetes_
+4. Install Kubernetes.
 
 ```sh
 # NOTE: If SSH requires a password, add: `-k`
@@ -52,22 +48,20 @@ _Install Kubernetes_
 ansible-playbook -i k8s-config/hosts.ini -b playbooks/k8s-cluster.yml
 ```
 
-_Test access to Kubernetes cluster is working_
+5. Verify that the Kubernetes cluster is working.
 
 ```sh
 # You may need to manually run: `sudo cp ./k8s-config/artifacts/kubectl /usr/local/bin`
 kubectl get nodes
 ```
 
-_Test GPU job_
+6. Test a GPU job.
 
 ```sh
 kubectl run gpu-test --rm -t -i --restart=Never --image=nvidia/cuda --limits=nvidia.com/gpu=1 -- nvidia-smi
 ```
 
-## Step 4: Optional Kubernetes Components
-
-### Kubernetes Dashboard
+7. Install the Kubernetes dashboard (optional).
 
 Run the script to create an administrative user and print out the dashboard URL and access token:
 
@@ -75,7 +69,7 @@ Run the script to create an administrative user and print out the dashboard URL 
 ./scripts/k8s_deploy_dashboard_user.sh
 ```
 
-### Storage
+8. Setup presistent storage (optional).
 
 Ceph cluster running on Kubernetes to provide persistent storage
 
@@ -83,7 +77,7 @@ Ceph cluster running on Kubernetes to provide persistent storage
 ./scripts/k8s_deploy_rook.sh
 ```
 
-### Monitoring
+9. Setup monitoring (optional)
 
 Prometheus and Grafana to monitor Kubernetes and cluster nodes
 
@@ -91,7 +85,7 @@ Prometheus and Grafana to monitor Kubernetes and cluster nodes
 ./scripts/k8s_deploy_monitoring.sh
 ```
 
-### Container Registry
+10. Setup the container registry
 
 The default container registry hostname is `registry.local`. To set another hostname (for example,
 one that is resolvable outside the cluster), add `-e container_registry_hostname=registry.example.com`.
