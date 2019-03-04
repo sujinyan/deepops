@@ -18,16 +18,16 @@ Instructions for deploying a GPU cluster with Kubernetes
 
 1. Install a supported operating system.
 
-    Install a supported operating system on all servers via a third-party solution 
-    (i.e. [MAAS](https://maas.io/), [Foreman](https://www.theforeman.org/)) or 
-    utilize the provided [OS install container](PXE.md).
+     Install a supported operating system on all servers via a third-party solution 
+     (i.e. [MAAS](https://maas.io/), [Foreman](https://www.theforeman.org/)) or 
+     utilize the provided [OS install container](PXE.md).
 
 2. Setup a control machine.
 
-   ```sh
-   # Install software prerequisites and copy default configuration
-   ./scripts/setup.sh
-   ```
+    ```sh
+    # Install software prerequisites and copy default configuration
+    ./scripts/setup.sh
+    ```
 
 3. Create a server inventory.
 
@@ -40,6 +40,8 @@ Instructions for deploying a GPU cluster with Kubernetes
    ```
 
 4. Install Kubernetes.
+
+   Wordage about [Ansible](ANSIBLE.md) documentation can perhaps go here.
 
    ```sh
    # NOTE: If SSH requires a password, add: `-k`
@@ -94,9 +96,7 @@ Instructions for deploying a GPU cluster with Kubernetes
     ansible-playbook -i k8s-config/hosts.ini -b --tags container-registry playbooks/k8s-services.yml
     ```
 
-## Additional Documentation
-
-[Ansible](ANSIBLE.md)
+## Additional Information
 
 More information on Kubespray can be found in the official [Getting Started Guide](https://github.com/kubernetes-sigs/kubespray/blob/master/docs/getting-started.md)
 
