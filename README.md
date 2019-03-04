@@ -15,7 +15,7 @@ optionally air-gapped datacenter or in the cloud.
 
 [Kubernetes (k8s)](https://kubernetes.io/docs/concepts/overview/what-is-kubernetes/) is an open-source system for automating deployment, scaling, and management of containerized applications.
 
-See the [Kubernetes Guide](docs/kubernetes-cluster.md) for information on building a GPU-enabled Kubernetes cluster
+See the [Kubernetes Deployment Guide](docs/kubernetes-cluster.md) for information on building a GPU-enabled Kubernetes cluster
 
 ### Slurm
 
