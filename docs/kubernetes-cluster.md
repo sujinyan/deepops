@@ -77,7 +77,7 @@ kubectl run gpu-test --rm -t -i --restart=Never --image=nvidia/cuda --limits=nvi
 ./scripts/k8s_deploy_rook.sh
 ```
 
-9. Setup monitoring (optional)
+9. Setup monitoring (optional).
 
    Prometheus and Grafana to monitor Kubernetes and cluster nodes
 
@@ -85,7 +85,7 @@ kubectl run gpu-test --rm -t -i --restart=Never --image=nvidia/cuda --limits=nvi
 ./scripts/k8s_deploy_monitoring.sh
 ```
 
-10. Setup the container registry
+10. Setup the container registry.
 
    The default container registry hostname is `registry.local`. To set another hostname (for example,
    one that is resolvable outside the cluster), add `-e container_registry_hostname=registry.example.com`.
