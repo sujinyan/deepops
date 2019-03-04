@@ -7,7 +7,6 @@ pipeline {
 cd virtual
 cp /opt/deepops_test/Vagrantfile .
 ./setup.sh
-./cluster_destroy.sh
 ./cluster_up.sh'''
       }
     }
