@@ -1,7 +1,7 @@
 Kubernetes Deployment Guide
 ===
 
-Instructions for deploying a GPU cluster with Kubernetes
+Instructions for deploying a GPU cluster with Kubernetes.
 
 ## Requirements
 
