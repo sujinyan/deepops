@@ -1,15 +1,16 @@
 Slurm Deployment Guide
 ===
 
-Instructions for deploying a GPU cluster with Slurm
+##Instructions for deploying a GPU cluster with Slurm
 
-**Requirements**
+## Requirements
 
   * Control system to run the install process
   * One server to act as the Slurm controller/login node
   * One or more servers to act as the Slurm compute nodes
   * (Optional) Management server (if installing OS via PXE)
 
+## Installation Instructions
 ## Step 1: Operating System Installation
 
 Install a supported operating system on all servers via
