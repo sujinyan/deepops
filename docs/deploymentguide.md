@@ -4,8 +4,8 @@ Deployment Guide
 
 ## Contents
 
-* [Overview] (#overview)
-* [Kubernetes Deployment] (#kubernetes-deployment)
+* [Overview](#overview)
+* [Kubernetes Deployment](#kubernetes-deployment)
 * [Slurm Deployment](#slurm-deployment)
 # [Standalone Deployment](standalone-deployment)
 
