@@ -58,7 +58,9 @@ Instructions for deploying a GPU cluster with Kubernetes
    kubectl run gpu-test --rm -t -i --restart=Never --image=nvidia/cuda --limits=nvidia.com/gpu=1 -- nvidia-smi
    ```
 
-7. Install the Kubernetes dashboard. (Optional)
+## Optional Steps
+
+1. Install the Kubernetes dashboard.
 
    Run the script to create an administrative user and print out the dashboard URL and access token:
 
@@ -66,7 +68,7 @@ Instructions for deploying a GPU cluster with Kubernetes
    ./scripts/k8s_deploy_dashboard_user.sh
    ```
 
-8. Setup presistent storage. (Optional)
+2. Setup presistent storage.
 
    Ceph cluster running on Kubernetes to provide persistent storage
 
@@ -74,7 +76,7 @@ Instructions for deploying a GPU cluster with Kubernetes
    ./scripts/k8s_deploy_rook.sh
    ```
 
-9. Setup monitoring. (Optional)
+3. Setup monitoring.
 
    Prometheus and Grafana to monitor Kubernetes and cluster nodes
 
@@ -82,7 +84,7 @@ Instructions for deploying a GPU cluster with Kubernetes
    ./scripts/k8s_deploy_monitoring.sh
    ```
 
-10. Setup the container registry. (Optional)
+4. Setup the container registry.
 
     The default container registry hostname is `registry.local`. To set another hostname (for example,
     one that is resolvable outside the cluster), add `-e container_registry_hostname=registry.example.com`.
