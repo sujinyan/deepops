@@ -6,13 +6,13 @@ Deployment Guide
 
 * [Overview](#overview)
 * [Kubernetes Deployment](#kubernetes-deployment)
-**[Requirements](#requirements)
-**[Installation Steps](#installation-steps)
-**[Additional Information](#additional-information)
-**[Optional Steps](#optional-steps)
+  * [Requirements](#requirements)
+  * [Installation Steps](#installation-steps)
+  * [Additional Information](#additional-information)
+  * [Optional Steps](#optional-steps)
 * [Slurm Deployment](#slurm-deployment)
-**[Requirements](#requirements)
-**[Installation Steps](#installation-steps)
+  * [Requirements](#requirements)
+  * [Installation Steps](#installation-steps)
 * [Standalone Deployment](standalone-deployment)
 
 ## Overview
