@@ -21,7 +21,7 @@ See the [Kubernetes Deployment Guide](docs/kubernetes-cluster.md) for informatio
 
 [Slurm](https://slurm.schedmd.com/overview.html) is an open source, fault-tolerant, and highly scalable cluster management and job scheduling system for large and small Linux clusters.
 
-See the [Slurm Guide](docs/slurm-cluster.md) for information on building a GPU-enabled Slurm cluster
+See the [Slurm Deployment Guide](docs/slurm-cluster.md) for information on building a GPU-enabled Slurm cluster
 
 ### DGX POD Hybrid Cluster
 
