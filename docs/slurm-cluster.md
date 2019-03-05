@@ -3,13 +3,6 @@ Slurm Deployment Guide
 
 Instructions for deploying a GPU cluster with Slurm
 
-## Overview
-
-**Install Process**
-
-  * Install a supported operating system (Ubuntu/RHEL)
-  * Install Slurm
-
 **Requirements**
 
   * Control system to run the install process
