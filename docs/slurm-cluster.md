@@ -11,13 +11,13 @@ Instructions for deploying a GPU cluster with Slurm
   * (Optional) Management server (if installing OS via PXE)
 
 ## Installation Instructions
-1. Operating System Installation
+1. Install the Operating System
 
    Install a supported operating system on all servers via a third-party solution 
    (i.e. [MAAS](https://maas.io/), [Foreman](https://www.theforeman.org/)) or 
    utilize the provided [OS install container](PXE.md).
 
-2. System Configuration
+2. Configure the System
 
    _Set up control machine_
 
