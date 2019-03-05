@@ -3,8 +3,6 @@ Kubernetes Deployment Guide
 
 Instructions for deploying a GPU cluster with Kubernetes
 
-__Better intro and DeepOps wordage goes here.__
-
 ## Requirements
 
   * Control system to run the install process
