@@ -1,7 +1,7 @@
 Slurm Deployment Guide
 ===
 
-##Instructions for deploying a GPU cluster with Slurm
+Instructions for deploying a GPU cluster with Slurm
 
 ## Requirements
 
