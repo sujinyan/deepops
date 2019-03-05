@@ -7,7 +7,7 @@ Deployment Guide
 * [Overview](#overview)
 * [Kubernetes Deployment](#kubernetes-deployment)
 * [Slurm Deployment](#slurm-deployment)
-# [Standalone Deployment](standalone-deployment)
+* [Standalone Deployment](standalone-deployment)
 
 ## Overview
 
