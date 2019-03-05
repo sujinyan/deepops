@@ -72,8 +72,6 @@ Instructions for deploying a GPU cluster with Kubernetes.
    kubectl get nodes
    ```
 
-6. Test a GPU job.
-
    ```sh
    kubectl run gpu-test --rm -t -i --restart=Never --image=nvidia/cuda --limits=nvidia.com/gpu=1 -- nvidia-smi
    ```
@@ -113,7 +111,7 @@ Instructions for deploying a GPU cluster with Kubernetes.
     ansible-playbook -i k8s-config/hosts.ini -b --tags container-registry playbooks/k8s-services.yml
     ```
 
-## Additional Information
+### Additional Information
 
 More information on Kubespray can be found in the official [Getting Started Guide](https://github.com/kubernetes-sigs/kubespray/blob/master/docs/getting-started.md)
 
@@ -128,7 +126,8 @@ Instructions for deploying a GPU cluster with Slurm
   * One or more servers to act as the Slurm compute nodes
   * (Optional) Management server (if installing OS via PXE)
 
-### Installation Instructions
+### Installation Steps
+
 1. Install the Operating System
 
    Install a supported operating system on all servers via a third-party solution 
