@@ -6,14 +6,15 @@ Deployment Guide
 
 * [Overview](#overview)
 * [Kubernetes Deployment](#kubernetes-deployment)
-  * [Requirements](#requirements)
-  * [Installation Steps](#installation-steps)
-  * [Additional Information](#additional-information)
-  * [Optional Steps](#optional-steps)
+  * [Requirements](#kubernetes-requirements)
+  * [Installation Steps](#kubernetes-install)
+  * [Additional Information](#kubernetes-additional)
+  * [Optional Steps](#kubernetes-optional)
 * [Slurm Deployment](#slurm-deployment)
-  * [Requirements](#requirements)
-  * [Installation Steps](#installation-steps)
-* [Standalone Deployment](standalone-deployment)
+  * [Requirements](#slurm-requirements)
+  * [Installation Steps](#slurm-installation)
+* [Standalone Deployment](#standalone-deployment)
+  * [Installation Steps](#standalone-install)
 
 ## Overview
 
@@ -23,13 +24,13 @@ __general blurb goes here__
 
 Instructions for deploying a GPU cluster with Kubernetes.
 
-### Requirements
+### Requirements <a name=kubernetes-requirements></a>
 
   * Control system to run the install process
   * One or more servers on which to install Kubernetes
   * (Optional) Management server (if installing OS via PXE)
 
-### Installation Steps
+### Installation Steps <a name=kubernetes-installation></a>
 
 1. Install a supported operating system.
 
@@ -76,7 +77,7 @@ Instructions for deploying a GPU cluster with Kubernetes.
    kubectl run gpu-test --rm -t -i --restart=Never --image=nvidia/cuda --limits=nvidia.com/gpu=1 -- nvidia-smi
    ```
 
-### Optional Steps
+### Optional Steps <a name=kubernetes-optional></a>
 
 1. Install the Kubernetes dashboard.
 
@@ -111,22 +112,22 @@ Instructions for deploying a GPU cluster with Kubernetes.
     ansible-playbook -i k8s-config/hosts.ini -b --tags container-registry playbooks/k8s-services.yml
     ```
 
-### Additional Information
+### Additional Information <a name=kubernetes-additional></a>
 
 More information on Kubespray can be found in the official [Getting Started Guide](https://github.com/kubernetes-sigs/kubespray/blob/master/docs/getting-started.md)
 
-## Slurm Deployment
+## Slurm Deployment <a name=slurm-deployment></a>
 
 Instructions for deploying a GPU cluster with Slurm
 
-### Requirements
+### Requirements <a name=slurm-requirements></a>
 
   * Control system to run the install process
   * One server to act as the Slurm controller/login node
   * One or more servers to act as the Slurm compute nodes
   * (Optional) Management server (if installing OS via PXE)
 
-### Installation Steps
+### Installation Steps <a name=slurm-installation></a>
 
 1. Install the Operating System
 
@@ -163,9 +164,11 @@ Instructions for deploying a GPU cluster with Slurm
    ansible-playbook -l slurm-cluster playbooks/slurm-cluster.yml
    ```
 
-## Standalone Deployment
+## Standalone Deployment <a name=standalone-deployment></a>
 
 Instructions for deploying standalone GPU servers.
+
+### Installation Steps  <a name=standalone-installation></a>
 
 The install process should be run from a separate control system since
 GPU driver installation may trigger a reboot.
