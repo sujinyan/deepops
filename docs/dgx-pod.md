@@ -171,13 +171,12 @@ segment and subnet which can be controlled by the DHCP server.
      For example:
 
      ```sh
-    auto ens192
+     auto ens192
         iface ens192 inet static
         address 192.168.1.1/24
         dns-nameservers 8.8.8.8 8.8.4.4
         gateway 192.168.1.1
         mtu 1500
-
 
 To run arbitrary commands in parallel across nodes in the cluster, you can use ansible
 and the groups or hosts defined in the inventory file. 
