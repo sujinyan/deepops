@@ -80,132 +80,118 @@ segment and subnet which can be controlled by the DHCP server.
 
 ## Installation Steps
 
-### Installation Overview
+1.  Download the DeepOps repo onto the provisioning system:
 
-1. Download and configure DeepOps repo
-2. Deploy management server(s)
-   * Bootstrap
-   * Deploy Kubernetes
-   * Deploy Ceph persistent storage on management nodes
-3. Deploy cluster service containers on Kubernetes
-   * DHCP/DNS/PXE, container registry, Apt repo, monitoring, alerting
-4. Deploy DGX-1 compute nodes
-   * Install DGX OS (via PXE), bootstrap (via Ansible)
-   * Update firmware (via Ansible, if required)
-   * Join DGX-1 compute nodes to Kubernetes cluster and deploy GPU device plugin
-5. Deploy login node
-   * Install OS (via PXE), bootstrap (via Ansible)
-   * Install/build HPC software and modules
-6. Deploy cluster SW layers
-   * Install Slurm HPC scheduler on login and compute nodes
-   * Configure Kubernetes Oauth integration for user access
+    ```sh
+    git clone --recursive https://github.com/NVIDIA/deepops.git
+    cd deepops
+    git submodule update
+    ```
 
-### 1. Download and configure
+    > Note: In Git 2.16.2 or later, use `--recurse-submodules` instead of `--recursive`.
+    > If you did a non-recursive clone, you can later run `git submodule update --init --recursive`
+    > to pull down submodules
 
-To use DeepOps this repository will need to be downloaded onto the administrator's provisioning system. The `setup.sh` script will then install the following software packages:
+2.  Install Ansible and other dependencies (if the below script fails follow the official [Ansible installation]
+    (https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html) steps to install 
+    version 2.5 or later):
 
-* Ansible
-* Docker
-* Git
-* ipmitool
-* python-netaddr (required by kubespray)
+    ```sh
+    ./scripts/setup.sh
+    ```
+    The `setup.sh` script installs the following software packages:
 
-Download the DeepOps repo onto the provisioning system:
+    * Ansible
+    * Docker
+    * Git
+    * ipmitool
+    * python-netaddr (required by kubespray)
 
-```sh
-git clone --recursive https://github.com/NVIDIA/deepops.git
-cd deepops
-git submodule update
-```
+2.  Copy and version control the configuration files. 
 
-> Note: In Git 2.16.2 or later, use `--recurse-submodules` instead of `--recursive`.
-> If you did a non-recursive clone, you can later run `git submodule update --init --recursive`
-> to pull down submodules
+    The `config/` directory is ignored by the deepops git repo. Create a seperate git repo 
+    to track local configuration changes.
 
-Install Ansible and other dependencies (if the below script fails follow the official [Ansible installation](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html) steps to install version 2.5 or later):
+    ```sh
+    cp -r config.example/ config/
+    cd config/
+    git init .
+    git add .
+    git commit -am 'initial commit' && cd ..
+    ```
 
-```sh
-./scripts/setup.sh
-```
+4.  Modify the `config/inventory` file to set the cluster server hostnames, and optional
+    per-host info like IP addresses and network interfaces. 
+    
+    The cluster should ideally use DNS, but you can also explicitly set server IP addresses 
+    in the inventory file.
 
-Copy and version control the configuration files. The `config/` directory is ignored by the deepops git repo. Create a seperate git repo to track local configuration changes.
+    Optional inventory settings:
 
-```sh
-cp -r config.example/ config/
-cd config/
-git init .
-git add .
-git commit -am 'initial commit' && cd ..
-```
+    * Use the `ansible_host` variable to set alternate IP addresses for servers or for
+      servers which do not have resolvable hostnames
+    * Use the `ib_bond_addr` variable to configure the infiniband network adapters
+      with IPoIB in a single bonded interface
 
-Modify the `config/inventory` file to set the cluster server hostnames, and optional
-per-host info like IP addresses and network interfaces. The cluster should
-ideally use DNS, but you can also explicitly set server IP addresses in the
-inventory file.
+    Configure cluster parameters by modifying the various yaml files in the `config/group_vars`
+    directory. The cluster-wide global config resides in the `all.yml` file, while
+    group-specific options reside in the other files. File names correspond to groups
+    in the inventory file, i.e. `[dgx-servers]` in the inventory file corresponds with
+    `config/group_vars/dgx-servers.yml`.
 
-Optional inventory settings:
+5.  Install the latest version of Ubuntu Server 16.04 LTS on each management server.
 
-* Use the `ansible_host` variable to set alternate IP addresses for servers or for
-servers which do not have resolvable hostnames
-* Use the `ib_bond_addr` variable to configure the infiniband network adapters
-with IPoIB in a single bonded interface
+    Be sure to enable SSH and record the user and password used during install.
 
-Configure cluster parameters by modifying the various yaml files in the `config/group_vars`
-directory. The cluster-wide global config resides in the `all.yml` file, while
-group-specific options reside in the other files. File names correspond to groups
-in the inventory file, i.e. `[dgx-servers]` in the inventory file corresponds with
-`config/group_vars/dgx-servers.yml`.
+    Note: The configuration assumes a single cpu-only management server, but multiple management 
+    servers can be used for high-availability.
 
-### 2. Management server setup
+6.  Add an SSH key to the configuration file.
 
-The configuration assumes a single cpu-only management server,
-but multiple management servers can be used for high-availability.
+    The password and SSH keys added to the `ubuntu` user in the `config/group_vars/all.yml` file will be configured 
+    on the management node. If the SSH key is not added, the `-k` flag will have to appended to Ansible commands 
+    following the bootstrap. 
 
-Install the latest version of Ubuntu Server 16.04 LTS on each management server.
-Be sure to enable SSH and record the user and password used during install.
+7.  Deploy management node(s)
 
-__Bootstrap:__
+    Type the password for the user you configured during management server OS installation when prompted to allow for 
+    the use of `sudo` when configuring the management servers. If the management servers were installed with the use 
+    of SSH keys and sudo does not require a password, you may omit the `-k` and `-K`flags.
 
-The password and SSH keys added to the `ubuntu` user in the `config/group_vars/all.yml`
-file will be configured on the management node. You should add an SSH key to the configuration
-file, or you will have to append the `-k` flag and type the password for the `ubuntu`
-user for all Ansible commands following the bootstrap.
+     ```sh
+     ansible-playbook -l management -k -K ansible/playbooks/bootstrap.yml
+     ```
 
-Deploy management node(s):
+     Where `management` is the group of servers in your `config/inventory` file which will become
+     management servers for the cluster.
 
-> Type the password for the user you configured during management server OS
-installation when prompted to allow for the use of `sudo` when configuring the
-management servers. If the management servers were installed with the use of
-SSH keys and sudo does not require a password, you may omit the `-k` and `-K`
-flags
+8.   If you need to configure a secondary network interface for the private DGX network, 
+     modify `/etc/network/interfaces`. 
+     
+     For example:
 
-```sh
-ansible-playbook -l management -k -K ansible/playbooks/bootstrap.yml
-```
+     ```sh
+    auto ens192
+        iface ens192 inet static
+        address 192.168.1.1/24
+        dns-nameservers 8.8.8.8 8.8.4.4
+        gateway 192.168.1.1
+        mtu 1500
 
-Where `management` is the group of servers in your `config/inventory` file which will become
-management servers for the cluster.
 
 To run arbitrary commands in parallel across nodes in the cluster, you can use ansible
-and the groups or hosts defined in the inventory file, for example:
+and the groups or hosts defined in the inventory file. 
 
-```sh
-ansible management -a hostname
-```
+For example:
 
-> For more info, see: https://docs.ansible.com/ansible/latest/user_guide/intro_adhoc.html
+    ```sh
+    ansible management -a hostname
+    ```
+
+For more info, see: https://docs.ansible.com/ansible/latest/user_guide/intro_adhoc.html
 
 If you need to configure a secondary network interface for the private DGX network,
 modify `/etc/network/interfaces`. For example:
-
-```sh
-auto ens192
-    iface ens192 inet static
-    address 192.168.1.1/24
-    dns-nameservers 8.8.8.8 8.8.4.4
-    gateway 192.168.1.1
-    mtu 1500
-```
 
 __Kubernetes:__
 
