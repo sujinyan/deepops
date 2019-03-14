@@ -183,14 +183,11 @@ and the groups or hosts defined in the inventory file.
 
 For example:
 
-    ```sh
-    ansible management -a hostname
-    ```
+     ```sh
+     ansible management -a hostname
+     ```
 
 For more info, see: https://docs.ansible.com/ansible/latest/user_guide/intro_adhoc.html
-
-If you need to configure a secondary network interface for the private DGX network,
-modify `/etc/network/interfaces`. For example:
 
 __Kubernetes:__
 
