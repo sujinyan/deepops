@@ -165,7 +165,7 @@ segment and subnet which can be controlled by the DHCP server.
      Where `management` is the group of servers in your `config/inventory` file which will become
      management servers for the cluster.
 
-8.   If you need to configure a secondary network interface for the private DGX network, 
+8.   If a secondary network interface for the private DGX network is needed, 
      modify `/etc/network/interfaces`. 
      
      For example:
@@ -178,96 +178,100 @@ segment and subnet which can be controlled by the DHCP server.
         gateway 192.168.1.1
         mtu 1500
 
-To run arbitrary commands in parallel across nodes in the cluster, you can use ansible
-and the groups or hosts defined in the inventory file. 
+     To run arbitrary commands in parallel across nodes in the cluster, you can use ansible 
+     and the groups or hosts defined in the inventory file. 
 
-For example:
+     For example:
 
      ```sh
      ansible management -a hostname
      ```
 
-For more info, see: https://docs.ansible.com/ansible/latest/user_guide/intro_adhoc.html
+    For more info, see: https://docs.ansible.com/ansible/latest/user_guide/intro_adhoc.html
 
-__Kubernetes:__
+9.  Deploy Kubernetes on management servers. 
 
-Deploy Kubernetes on management servers:
+    Modify the file `config/kube.yml` if needed and deploy Kubernetes:
 
-Modify the file `config/kube.yml` if needed and deploy Kubernetes:
+    ```sh
+    ansible-playbook -l management -v -b --flush-cache --extra-vars "@config/kube.yml" kubespray/cluster.yml
+    ```
+    <!--
+    Place a hold on the `docker-ce` package so it doesn't get upgraded:
 
-```sh
-ansible-playbook -l management -v -b --flush-cache --extra-vars "@config/kube.yml" kubespray/cluster.yml
-```
-<!--
-Place a hold on the `docker-ce` package so it doesn't get upgraded:
+    ```sh
+    ansible management -b -a "apt-mark hold docker-ce"
+    ```
+    -->
 
-```sh
-ansible management -b -a "apt-mark hold docker-ce"
-```
--->
+10. Set up Kubernetes for remote administration.
 
-Set up Kubernetes for remote administration:
+    ```sh
+    ansible management -b -m fetch -a "src=/etc/kubernetes/admin.conf flat=yes dest=./"
+    curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl 
+    -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+    chmod +x ./kubectl
+    ```
 
-```sh
-ansible management -b -m fetch -a "src=/etc/kubernetes/admin.conf flat=yes dest=./"
-curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
-chmod +x ./kubectl
-```
+11. <Give explicit directions here>
 
-To make administration easier, you may want to copy the `kubectl` binary to someplace in your `$PATH`
-and copy the `admin.conf` configuration file to `~/.kube/config` so that it is used by default.
-Otherwise, you may use the `kubectl` flag `--kubeconfig=./admin.conf` instead of copying the configuration file.
+    To make administration easier, you may want to copy the `kubectl` binary to someplace in your `$PATH` and 
+    copy the `admin.conf` configuration file to `~/.kube/config` so that it is used by default. Otherwise, you 
+    may use the `kubectl` flag `--kubeconfig=./admin.conf` instead of copying the configuration file.
 
-```sh
-mkdir -p ~/.kube/
-mv admin.conf ~/.kube/config
-```
+    ```sh
+    mkdir -p ~/.kube/
+    mv admin.conf ~/.kube/config
+    ```
 
-__Optionally__, If you have an existing Kubernetes configuration file, you can merge the two with:
+12. If you have an existing Kubernetes configuration file, you can merge the two with:
 
-```sh
-mkdir -p ~/.kube && mv ~/.kube/config{,.bak} && KUBECONFIG=./admin.conf:~/.kube/config.bak kubectl config view --flatten | tee ~/.kube/config
-if [ "$?" != "0" ]; then cp admin.conf ~/.kube/config; fi
-```
+    ```sh
+    mkdir -p ~/.kube && mv ~/.kube/config{,.bak} && KUBECONFIG=./admin.conf:~/.kube/config.bak kubectl config view --flatten |
+    tee ~/.kube/config
+    if [ "$?" != "0" ]; then cp admin.conf ~/.kube/config; fi
+    ```
 
-Test you can access the kubernetes cluster:
+13. Ensure that the kubernetes cluster can be accessed.
 
-```sh
-$ kubectl get nodes
-NAME      STATUS    ROLES         AGE       VERSION
-mgmt01    Ready     master,node   7m        v1.12.4
-```
+     ```sh
+     $ kubectl get nodes
+     NAME      STATUS    ROLES         AGE       VERSION
+     mgmt01    Ready     master,node   7m        v1.12.4
+     ```
 
-__Helm:__
+14. Install Helm.
 
-Some services are installed using [Helm](https://helm.sh/), a package manager for Kubernetes.
+    Some services are installed using [Helm](https://helm.sh/), a package manager for Kubernetes.
+    
+    If you did not modify your `config/kube.yml` file to disable the `helm_enabled` flag you can now initialize helm.
 
-If you did not modify your `config/kube.yml` file to disable the `helm_enabled` flag you can now initialize helm.
+    ```sh
+    helm init
+    ```
 
-```sh
-helm init
-```
+    __Optionally__, If you disabled the `helm_enabled` field you can follow [these steps](helm.md) to manually install 
+    and configure helm.
 
-__Optionally__, If you disabled the `helm_enabled` field you can follow [these steps](helm.md) to manually install and configure helm.
+15. Install Ceph.
 
-__Ceph:__
+    Persistent storage for Kubernetes on the management nodes is supplied by Ceph. Ceph is provisioned using Rook to 
+    simplify deployment:
 
-Persistent storage for Kubernetes on the management nodes is supplied by Ceph. Ceph is provisioned using Rook to simplify deployment:
-<!-- find latest rook version with: helm search rook-ceph -->
-<!-- https://github.com/rook/rook/blob/master/Documentation/helm-operator.md -->
-```sh
-helm repo add rook-master https://charts.rook.io/master
-helm install --namespace rook-ceph-system --name rook-ceph rook-master/rook-ceph --version v0.9.0-79.g1a1ffdd
-kubectl create -f services/rook-cluster.yml
-```
+    <!-- find latest rook version with: helm search rook-ceph -->
+    <!-- https://github.com/rook/rook/blob/master/Documentation/helm-operator.md -->
+    ```sh
+    helm repo add rook-master https://charts.rook.io/master
+    helm install --namespace rook-ceph-system --name rook-ceph rook-master/rook-ceph --version v0.9.0-79.g1a1ffdd
+    kubectl create -f services/rook-cluster.yml
+    ```
+    > Caution, wait for the polling script to complete or later steps will fail. It may take up to 10 minutes.
 
-> Caution, wait for the polling script to complete or later steps will fail. It may take up to 10 minutes.
+17. Poll the Ceph status.
 
-Poll the Ceph status by running:
-
-```sh
-./scripts/ceph_poll.sh
-```
+    ```sh
+    ./scripts/ceph_poll.sh
+    ```
 
 ### 3. Services
 
