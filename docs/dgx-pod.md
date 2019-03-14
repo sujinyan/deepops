@@ -78,7 +78,7 @@ and will allow you to automatically install the official DGX base OS on DGX serv
 If you elect to use this management service, you will need to have a dedicated network
 segment and subnet which can be controlled by the DHCP server.
 
-## Installation Steps
+## Install 
 
 1.  Download the DeepOps repo onto the provisioning system:
 
@@ -189,7 +189,9 @@ segment and subnet which can be controlled by the DHCP server.
 
     For more info, see: https://docs.ansible.com/ansible/latest/user_guide/intro_adhoc.html
 
-9.  Deploy Kubernetes on management servers. 
+## Kubernetes, Helm, and Ceph
+
+1.  Deploy Kubernetes on management servers. 
 
     Modify the file `config/kube.yml` if needed and deploy Kubernetes:
 
@@ -204,7 +206,7 @@ segment and subnet which can be controlled by the DHCP server.
     ```
     -->
 
-10. Set up Kubernetes for remote administration.
+2. Set up Kubernetes for remote administration.
 
     ```sh
     ansible management -b -m fetch -a "src=/etc/kubernetes/admin.conf flat=yes dest=./"
@@ -213,7 +215,7 @@ segment and subnet which can be controlled by the DHCP server.
     chmod +x ./kubectl
     ```
 
-11. <Give explicit directions here>
+3. <Give explicit directions here>
 
     To make administration easier, you may want to copy the `kubectl` binary to someplace in your `$PATH` and 
     copy the `admin.conf` configuration file to `~/.kube/config` so that it is used by default. Otherwise, you 
@@ -224,7 +226,7 @@ segment and subnet which can be controlled by the DHCP server.
     mv admin.conf ~/.kube/config
     ```
 
-12. If you have an existing Kubernetes configuration file, you can merge the two with:
+4. If you have an existing Kubernetes configuration file, you can merge the two with:
 
     ```sh
     mkdir -p ~/.kube && mv ~/.kube/config{,.bak} && KUBECONFIG=./admin.conf:~/.kube/config.bak kubectl config view --flatten |
@@ -232,15 +234,14 @@ segment and subnet which can be controlled by the DHCP server.
     if [ "$?" != "0" ]; then cp admin.conf ~/.kube/config; fi
     ```
 
-13. Ensure that the kubernetes cluster can be accessed.
+5. Ensure that the kubernetes cluster can be accessed.
 
      ```sh
      $ kubectl get nodes
      NAME      STATUS    ROLES         AGE       VERSION
      mgmt01    Ready     master,node   7m        v1.12.4
      ```
-
-14. Install Helm.
+6. Install Helm.
 
     Some services are installed using [Helm](https://helm.sh/), a package manager for Kubernetes.
     
@@ -253,7 +254,7 @@ segment and subnet which can be controlled by the DHCP server.
     __Optionally__, If you disabled the `helm_enabled` field you can follow [these steps](helm.md) to manually install 
     and configure helm.
 
-15. Install Ceph.
+7. Install Ceph.
 
     Persistent storage for Kubernetes on the management nodes is supplied by Ceph. Ceph is provisioned using Rook to 
     simplify deployment:
@@ -267,7 +268,7 @@ segment and subnet which can be controlled by the DHCP server.
     ```
     > Caution, wait for the polling script to complete or later steps will fail. It may take up to 10 minutes.
 
-17. Poll the Ceph status.
+8. Poll the Ceph status.
 
     ```sh
     ./scripts/ceph_poll.sh
