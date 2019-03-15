@@ -78,7 +78,9 @@ and will allow you to automatically install the official DGX base OS on DGX serv
 If you elect to use this management service, you will need to have a dedicated network
 segment and subnet which can be controlled by the DHCP server.
 
-## Install 
+# Installation
+
+## Basic Components
 
 1.  Download the DeepOps repo onto the provisioning system:
 
