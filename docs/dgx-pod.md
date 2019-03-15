@@ -274,7 +274,7 @@ segment and subnet which can be controlled by the DHCP server.
     ./scripts/ceph_poll.sh
     ```
 
-### 3. Services
+## Services
 
 #### __Ingress controller:__
 
@@ -350,26 +350,22 @@ kubectl create configmap dhcpd --from-file=config/dhcpd.hosts.conf
 kubectl create configmap pxe-machines --from-file=config/machines.json
 ```
 
-__Deploy DGXie service__
+1.  Launch the DGXie service.
 
-Launch the DGXie service:
+    ```sh
+    helm install --values config/helm/dgxie.yml services/dgxie
+    ```
 
-```sh
-helm install --values config/helm/dgxie.yml services/dgxie
-```
+2.  Check the DGXie logs to make sure the services were started without errors:
 
-Check the DGXie logs to make sure the services were started without errors:
-
-```sh
-kubectl logs -l app=dgxie
-```
-<!--
-Configure the management server(s) to use DGXie for cluster-wide DNS:
-
-```sh
-ansible-playbook -l management ansible/playbooks/resolv.yml
-```
--->
+    ```sh
+    kubectl logs -l app=dgxie
+    ```
+    <!--Configure the management server(s) to use DGXie for cluster-wide DNS:
+    ```sh
+    ansible-playbook -l management ansible/playbooks/resolv.yml
+    ```
+    -->
 
 If you later make changes to `config/dhcpd.hosts.conf` or `machines.json` you can follow the [steps](dgxie.md) to update the dgxie service.
 
