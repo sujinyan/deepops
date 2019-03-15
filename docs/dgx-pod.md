@@ -676,23 +676,25 @@ add login node(s) to the kubernetes cluster, add login servers to the kubernetes
 in the `config/inventory` file and re-run the ansible playbooks as above for management and
 DGX servers.
 
-__Provisioning:__
+## Provisioning
 
-Modify `config/dhcpd.hosts.conf` to add a static IP lease for each login node
-if required. IP addresses should match those used in the `config/inventory` file.
+1.  If required, modify `config/dhcpd.hosts.conf` to add a static IP lease for each login node.
 
-```sh
-grep TODO config/dhcpd.hosts.conf
-```
+    IP addresses should match those used in the `config/inventory` file.
 
-Modify `config/machines.json` to add a PXE entry for each login node.
-Copy the `64-bit-ubuntu-example` section and modify
-the MAC address for each login node you would like to boot. You can modify boot parameters or install
-alternate operating systems if required.
+    ```sh
+    grep TODO config/dhcpd.hosts.conf
+    ```
 
-```sh
-grep TODO config/machines.json
-```
+2.  Modify `config/machines.json` to add a PXE entry for each login node.
+
+    Copy the `64-bit-ubuntu-example` section and modify the MAC address for each login node 
+    you would like to boot. You can modify boot parameters or install alternate operating systems 
+    if required.
+
+    ```sh
+    grep TODO config/machines.json
+    ```
 
 __Important:__ Follow the [steps listed here ](dgxie.md)  to update the DGXie with the new dhcp and PXE configurations. 
 
@@ -755,27 +757,31 @@ sudo scontrol update node=dgx01 state=drain reason=k8s
 
 It is also possible to remove the DGX from kubernetes and reserve the resources only for Slurm or to run a mixed hybrid mode.
 
-## Cluster Usage
+# Maintenance
 
-### Maintenance
-
-__Updating Firmware:__
+## Updating Firmware
 
 Firmware on the DGX can be updated through the firmware update container(s) and Ansible.
 
-1. Download the firmware update container package from the NVIDIA Enterprise Support Portal.
-Updates are published as announcements on the support portal (example: https://goo.gl/3zimCk).
-Make sure you download the correct package depending on the GPU in the DGX-1:
-   - For V100 (Volta), download the '0102' package - for example: https://dgxdownloads.nvidia.com/custhelp/dgx1/NVIDIA_Containers/nvidia-dgx-fw-0102-20180424.tar.gz
-   - For P100 (Pascal), download the '0101' package - for example: https://dgxdownloads.nvidia.com/custhelp/dgx1/NVIDIA_Containers/nvidia-dgx-fw-0101-20180424.tar.gz
+1.  Download the firmware update container package from the NVIDIA Enterprise Support Portal.
+
+    Updates are published as announcements on the support portal (example: https://goo.gl/3zimCk).
+    Make sure you download the correct package depending on the GPU in the DGX-1:
+    - For Tesla V100 GPUs, download the '0102' package - for example: 
+      https://dgxdownloads.nvidia.com/custhelp/dgx1/NVIDIA_Containers/nvidia-dgx-fw-0102-20180424.tar.gz
+   - For Tesla P100 GPUs, download the '0101' package - for example: 
+     https://dgxdownloads.nvidia.com/custhelp/dgx1/NVIDIA_Containers/nvidia-dgx-fw-0101-20180424.tar.gz
+
 2. Once you've download the `.tar.gz` file, copy or move it inside `containers/dgx-firmware`
-3. Edit the value of `firmware_update_container` in the file `ansible/roles/nvidia-dgx-firmware/vars/main.yml` to match
-the name of the downloaded firmware container.
+
+3. Edit the value of `firmware_update_container` in the file `ansible/roles/nvidia-dgx-firmware/vars/main.yml` 
+   to match the name of the downloaded firmware container.
+
 4. Run the Ansible playbook to update DGX firmware:
 
-```sh
-ansible-playbook -k -l dgx-servers ansible/playbooks/firmware.yml
-```
+   ```sh
+   ansible-playbook -k -l dgx-servers ansible/playbooks/firmware.yml
+   ```
 
 #### Login server
 
@@ -794,7 +800,7 @@ The `playbooks/extra.yml` file contains optional configuration (these will be mo
 ansible-playbook -k -l all playbooks/extra.yml
 ```
 
-__Building software__:
+## Building software
 
 HPC clusters generally utilize a system of versioned software modules instead of installing
 software via the OS package manager. These software builds can be made easier with the EasyBuild tool.
@@ -867,9 +873,9 @@ export MODULEPATH=$EASYBUILD_PREFIX/modules/all:$MODULEPATH
 module load HPL
 ```
 
-#### Cluster-wide
+# Cluster-wide
 
-__Slurm updates:__
+## Updating Slurm
 
 ```sh
 # whole shebang:
@@ -878,13 +884,13 @@ ansible-playbook -k -l slurm-cluster ansible/playbooks/slurm.yml
 ansible-playbook -k -l slurm-workers --tags prolog,epilog -e 'gather_facts=no' ansible/playbooks/slurm.yml
 ```
 
-__Modify GPU drivers:__
+## Modifying GPU drivers
 
 ```sh
 ansible-playbook -k -l <dgx-hostname> playbooks/gpu-driver.yml
 ```
 
-__Extra:__
+## Extra
 
 Set up `/raid` RAID-0 array cache (can also add `rebuild-raid` to PXE boot cmdline when installing):
 
