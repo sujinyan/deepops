@@ -278,87 +278,96 @@ segment and subnet which can be controlled by the DHCP server.
 
 ## Services
 
-#### __Ingress controller:__
+### Ingress controller
 
 An ingress controller routes external traffic to services.
 
-Modify `config/helm/ingress.yml` if needed and install the ingress controller:
+1.  Modify `config/helm/ingress.yml` if needed and install the ingress controller
 
-```sh
-helm install --values config/helm/ingress.yml stable/nginx-ingress
-```
+    ```sh
+    helm install --values config/helm/ingress.yml stable/nginx-ingress
+    ```
 
-You can check the ingress controller logs with:
+2. Check the ingress controller logs.
 
-```sh
-kubectl logs -l app=nginx-ingress
-```
+   ```sh
+   kubectl logs -l app=nginx-ingress
+   ```
 
-#### __DHCP/DNS/PXE server (DGXie):__
+### DHCP/DNS/PXE server (DGXie)
 
 DGXie is an all-in-one container for DHCP, DNS, and PXE, specifically tailored to the DGX Base OS.
 If you already have DHCP, DNS, or PXE servers you can skip this step.
 
-__Setup__
+1.  Download the DGX OS ISO to the provisioning machine.
 
-You will need to download the official DGX Base OS ISO image to your provisioning machine.
-The latest DGX Base OS is available via the NVIDIA Entperprise Support Portal (ESP).
+    The latest DGX OS ISO is available via the NVIDIA Entperprise Support Portal (ESP).
 
-Copy the DGX Base OS ISO to shared storage via a container running in Kubernetes,
-substituting the path to the DGX ISO you downloaded (be sure to wait for the `iso-loader` POD
-to be in the *Running* state before attempting to copy the ISO):
+2.  Ensure the `iso-loader` POD is in the *Running* state.
 
-```sh
-kubectl apply -f services/iso-loader.yml
-kubectl cp /local/DGXServer-4.0.2.180925_6acd9c.iso $(kubectl get pod -l app=iso-loader -o custom-columns=:metadata.name --no-headers):/data/iso/
-```
+    <how>
+ 
+3.  Copy the DGX OS ISO to shared storage via a container running in Kubernetes.
+    
+    Substitute the path to the DGX OS ISO.
 
-> Note: If the `iso-loader` POD fails to mount the CephFS volume, you may need to restart the kubelet service on the master node(s): `ansible mgmt -b -a "systemctl restart kubelet"`
-> You may see an error that looks like this in your syslog file: `failed to get Plugin from volumeSpec for volume "cephfs" err=no volume plugin matched`
+    ```sh
+    kubectl apply -f services/iso-loader.yml
+    kubectl cp /local/DGXServer-4.0.2.180925_6acd9c.iso $(kubectl get pod -l app=iso-loader -o custom-columns=:metadata.name 
+    --no-headers):/data/iso/
+    ```
 
-__Configure__
+    Note: If the `iso-loader` POD fails to mount the CephFS volume, restart of the kubelet service on the master node(s): 
+    `ansible mgmt -b -a "systemctl restart kubelet"`
+   
+    You may see an error that looks like this in your syslog file: 
+    `failed to get Plugin from volumeSpec for volume "cephfs" err=no volume plugin matched`
 
-Modify the DGXie configuration in `config/helm/dgxie.yml` to set values for the DHCP server
-and DGX install process.
+4.  Modify the DGXie configuration in `config/helm/dgxie.yml` to set values for the DHCP server and DGX install process.
 
-Modify `config/dhcpd.hosts.conf` to add a static IP lease for each login node and DGX
-server in the cluster if required. IP addresses should match those used in the `config/inventory` file.
-You may also add other valid configuration options for dnsmasq to this file.
+5.  Modify `config/dhcpd.hosts.conf` to add a static IP lease for each login node and DGX server in the cluster if required. 
 
-```sh
-grep TODO config/*
-```
+    IP addresses should match those used in the `config/inventory` file.
 
-> Note: There are several `TODO` comments in these configuration files that will likely need to be changed. Depending on the system architecture there may be additional required config changes.
+    You may also add other valid configuration options for dnsmasq to this file.
 
-You can get the MAC address of DGX system interfaces via the BMC, for example:
+    ```sh
+    grep TODO config/*
+    ```
 
-```sh
-# interface 1
-ipmitool -I lanplus -U <username> -P <password> -H <DGX BMC IP> raw 0x30 0x19 0x00 0x02 | tail -c 18 | tr ' ' ':'
-# interface 2
-ipmitool -I lanplus -U <username> -P <password> -H <DGX BMC IP> raw 0x30 0x19 0x00 0x12 | tail -c 18 | tr ' ' ':'
-```
+    Note: There are several `TODO` comments in these configuration files that will likely need to be changed. 
+    Depending on the system architecture there may be additional required config changes.
 
-Modify `config/machines.json` to add a PXE entry for each DGX. Copy the `dgx-example` section and modify
-the MAC address for each DGX you would like to boot. You can modify boot parameters or install
-alternate operating systems if required.
+    You can get the MAC address of DGX server interfaces via the BMC, for example:
 
-Store the config files as config-maps in Kubernetes, even if you have not
-made any changes (the DGXie container will try to mount these config maps):
+    ```sh
+    # interface 1
+    ipmitool -I lanplus -U <username> -P <password> -H <DGX BMC IP> raw 0x30 0x19 0x00 0x02 | tail -c 18 | tr ' ' ':'
+    # interface 2
+    ipmitool -I lanplus -U <username> -P <password> -H <DGX BMC IP> raw 0x30 0x19 0x00 0x12 | tail -c 18 | tr ' ' ':'
+    ```
 
-```sh
-kubectl create configmap dhcpd --from-file=config/dhcpd.hosts.conf
-kubectl create configmap pxe-machines --from-file=config/machines.json
-```
+6.  Modify `config/machines.json` to add a PXE entry for each DGX server. 
 
-1.  Launch the DGXie service.
+7.  Copy the `dgx-example` section and modify the MAC address for each DGX you would like to boot. 
+
+    You can modify boot parameters or install alternate operating systems if required.
+
+8.  Store the config files as config-maps in Kubernetes, even if you have not made any changes 
+    (the DGXie container will try to mount these config maps):
+
+    ```sh
+    kubectl create configmap dhcpd --from-file=config/dhcpd.hosts.conf
+    kubectl create configmap pxe-machines --from-file=config/machines.json
+    ```
+
+9.  Launch the DGXie service.
 
     ```sh
     helm install --values config/helm/dgxie.yml services/dgxie
     ```
 
-2.  Check the DGXie logs to make sure the services were started without errors:
+10. Check the DGXie logs to make sure the services were started without errors:
 
     ```sh
     kubectl logs -l app=dgxie
